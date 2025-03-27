@@ -17,7 +17,6 @@
     "Other"
   ],
   "activationEvents": [
-    "*",
     "onStartupFinished",
     "onCommand:speech-note.startListening",
     "onCommand:speech-note.stopListening", 

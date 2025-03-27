@@ -83,7 +83,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     // Show successful activation notification
-    vscode.window.showInformationMessage('Speech Note extension is ready (v' + VERSION + ')');
+    vscode.window.showInformationMessage(`Speech Note extension is ready (v${VERSION})`);
     console.log('🎤 Speech Note extension activated successfully');
   } catch (error) {
     console.error('🎤 Speech Note extension activation failed:', error);
