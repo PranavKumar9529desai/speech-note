@@ -1,0 +1,94 @@
+{
+  "name": "speech-note",
+  "displayName": "Speech Note",
+  "description": "Integrate Speech Note with VS Code for voice dictation",
+  "version": "0.1.0",
+  "publisher": "speech-note-extension",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/speech-vscode-extension"
+  },
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "extensionKind": ["ui", "workspace"],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*",
+    "onStartupFinished",
+    "onCommand:speech-note.startListening",
+    "onCommand:speech-note.stopListening", 
+    "onCommand:speech-note.toggleListening"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "speech-note.startListening",
+        "title": "Start Speech Note Listening"
+      },
+      {
+        "command": "speech-note.stopListening",
+        "title": "Stop Speech Note Listening"
+      },
+      {
+        "command": "speech-note.toggleListening",
+        "title": "Toggle Speech Note Listening"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "speech-note.startListening",
+        "key": "alt+l",
+        "mac": "alt+l"
+      },
+      {
+        "command": "speech-note.stopListening",
+        "key": "alt+s",
+        "mac": "alt+s"
+      },
+      {
+        "command": "speech-note.toggleListening",
+        "key": "alt+t",
+        "mac": "alt+t"
+      }
+    ],
+    "configuration": {
+      "title": "Speech Note",
+      "properties": {
+        "speechNote.executablePath": {
+          "type": "string",
+          "default": "flatpak run net.mkiol.SpeechNote",
+          "description": "Path to the Speech Note executable"
+        },
+        "speechNote.clipboardPollingInterval": {
+          "type": "number",
+          "default": 500,
+          "description": "Interval in milliseconds to check clipboard for new content"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@types/node": "^18.x",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "eslint": "^8.39.0",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "clipboardy": "^2.3.0"
+  }
+}

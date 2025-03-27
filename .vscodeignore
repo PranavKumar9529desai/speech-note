@@ -1,0 +1,16 @@
+.vscode/**
+.git/**
+.gitignore
+node_modules/**
+src/**
+tsconfig.json
+.cursor/**
+**/*.ts
+**/*.map
+*.vsix
+.github/**
+architecture.md
+objective.md
+SppechNote.md
+!out/
+!out/** 

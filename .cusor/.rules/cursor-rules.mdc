@@ -1,0 +1,199 @@
+# Speech Note VS Code Extension - Code Generation Guidelines
+
+## Type System
+
+1. **Strong Typing**: Always use explicit TypeScript types. Avoid `any` type unless absolutely necessary.
+   ```typescript
+   // Good
+   function processText(input: string): string { ... }
+   
+   // Avoid
+   function processText(input): any { ... }
+   ```
+
+2. **Use Interfaces**: Define clear interfaces for data structures and component communication.
+   ```typescript
+   interface SpeechNoteOptions {
+     outputPath: string;
+     listeningMode: ListeningMode;
+     clearAfterCapture: boolean;
+   }
+   ```
+
+3. **Enums for Constants**: Use TypeScript enums for related constant values.
+   ```typescript
+   enum ListeningMode {
+     Standard = 'standard',
+     Translate = 'translate',
+     Clipboard = 'clipboard'
+   }
+   ```
+
+## Code Organization
+
+1. **Single Responsibility**: Each file and class should have a single responsibility.
+
+2. **Service Separation**: Maintain clear separation between:
+   - VS Code extension API interactions
+   - Speech Note CLI interactions
+   - File system operations
+   - Text injection logic
+
+3. **Dependency Injection**: Use dependency injection patterns to improve testability.
+
+## Error Handling
+
+1. **Specific Error Handling**: Handle specific errors appropriately.
+   ```typescript
+   try {
+     // Operation that might fail
+   } catch (error) {
+     if (error instanceof FileSystemError) {
+       // Handle filesystem error
+     } else if (error instanceof ProcessError) {
+       // Handle process error
+     } else {
+       // Handle other errors
+     }
+   }
+   ```
+
+2. **User Feedback**: Provide meaningful error messages to the user via VS Code's notification API.
+
+3. **Graceful Degradation**: If Speech Note is not available or fails, provide fallback behavior where possible.
+
+## Asynchronous Code
+
+1. **Use Promises/Async-Await**: Prefer async/await over callbacks.
+   ```typescript
+   async function captureText(): Promise<string> {
+     try {
+       const result = await execProcess('dsnote', ['--action', 'start-listening']);
+       return result.stdout;
+     } catch (error) {
+       throw new ProcessError('Failed to capture speech', error);
+     }
+   }
+   ```
+
+2. **Cancel Operations**: Support cancellation of long-running operations.
+
+## Security
+
+1. **Input Validation**: Validate all inputs, especially those coming from files or user settings.
+
+2. **Output Sanitization**: Sanitize any output before displaying or injecting it into documents.
+
+3. **No Hardcoded Secrets**: Never include API keys or credentials in the code.
+
+## VS Code Extension Practices
+
+1. **Context Usage**: Use VS Code's extension context for resource management.
+   ```typescript
+   export function activate(context: vscode.ExtensionContext) {
+     const disposable = vscode.commands.registerCommand('speech-note.startListening', startListening);
+     context.subscriptions.push(disposable);
+   }
+   ```
+
+2. **Command Registration**: Register all commands explicitly in package.json with corresponding handlers.
+
+3. **Settings Integration**: Use VS Code's settings API for user-configurable options.
+
+## Documentation
+
+1. **JSDoc Comments**: Add JSDoc comments for all exported functions, classes, and interfaces.
+   ```typescript
+   /**
+    * Injects captured text at the current cursor position
+    * @param text - The text to inject
+    * @returns Promise that resolves when text is inserted
+    */
+   async function injectTextAtCursor(text: string): Promise<void> { ... }
+   ```
+
+2. **README**: Maintain a comprehensive README with installation and usage instructions.
+
+3. **Code Comments**: Add comments for complex logic, but avoid obvious comments.
+
+## Naming Conventions
+
+1. **Descriptive Names**: Use descriptive names for variables, functions, and classes.
+   ```typescript
+   // Good
+   const speechNoteProcess = spawn('dsnote', options);
+   
+   // Avoid
+   const proc = spawn('dsnote', options);
+   ```
+
+2. **Consistent Casing**:
+   - `camelCase` for variables and functions
+   - `PascalCase` for classes and interfaces
+   - `UPPER_SNAKE_CASE` for constants
+   - `kebab-case` for file names
+
+## Testing
+
+1. **Unit Tests**: Write unit tests for all business logic.
+
+2. **Mocking**: Mock external dependencies (e.g., Speech Note CLI, file system).
+
+3. **Integration Tests**: Test the extension in a VS Code Extension Development Host.
+
+## Performance
+
+1. **Resource Management**: Release resources when they are no longer needed.
+   ```typescript
+   // Remember to dispose of event listeners, file watchers, etc.
+   watcher.dispose();
+   ```
+
+2. **Debounce Operations**: Debounce frequent operations, especially for file watching.
+   ```typescript
+   const debouncedProcessor = debounce(processFile, 300);
+   ```
+
+## File System Operations
+
+1. **Use Async File API**: Prefer asynchronous file operations.
+   ```typescript
+   const text = await fs.promises.readFile(filePath, 'utf8');
+   ```
+
+2. **Path Handling**: Use path.join for cross-platform compatibility.
+   ```typescript
+   const tempPath = path.join(os.tmpdir(), 'vscode-speech-note.txt');
+   ```
+
+## Process Management
+
+1. **Error Streams**: Always capture both stdout and stderr from spawned processes.
+   ```typescript
+   const process = spawn('dsnote', options, {
+     stdio: ['ignore', 'pipe', 'pipe']
+   });
+   ```
+
+2. **Process Cleanup**: Ensure child processes are properly terminated.
+   ```typescript
+   process.on('close', (code) => {
+     if (code !== 0) {
+       vscode.window.showErrorMessage(`Speech Note process exited with code ${code}`);
+     }
+   });
+   ```
+
+## Configuration
+
+1. **Configuration Validation**: Validate configuration options before use.
+
+2. **Defaults**: Provide sensible defaults for all configuration options.
+
+3. **Extension Settings**: Use VS Code's configuration API.
+   ```typescript
+   const config = vscode.workspace.getConfiguration('speechNote');
+   const tempFilePath = config.get<string>('tempFilePath') || defaultTempFilePath;
+   ```
+
+
